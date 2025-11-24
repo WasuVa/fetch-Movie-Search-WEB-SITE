@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FETCH MOVIES — Home</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css">
+    
+</head>
+<body>
+    <header class="navbar-header">
+        <nav class="navbar">
+            <div class="brand">
+                <div class="logo-group">
+                    <a href="index.html"><img class="logo-main" src="assets/Mainlogo.png" alt="main logo"></a>
+                    <a href="index.html"><img class="logo-name" src="assets/namelogo.png" alt="name logo"></a>
+                </div>
+            </div>
+            
+            <ul class="nav-menu">
+                <li><a href="home.html" class="nav-link active">Home</a></li>
+                <li><a href="populer.html" class="nav-link">Popular</a></li>
+                <li><a href="about.html" class="nav-link">About</a></li>
+                <li><a href="search.html" class="nav-link">Search</a></li>
+            </ul>
+
+            <div class="hamburger">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </nav>
+    </header>
+
+    <section class="search-wrap">
+        <form id="searchForm" class="search" onsubmit="return false;">
+            <input id="query" type="search" placeholder="Search movies by title, e.g. Inception, The Matrix..." aria-label="Search movies">
+            <button id="searchBtn" type="submit">Search</button>
+        </form>
+    </section>
+
+    <section class="hero" aria-hidden="false">
+        <img src="https://images.unsplash.com/photo-1517604931442-7d4a7f4a3d6b?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder" alt="Cinema">
+        <div class="txt">
+            <h2>Find movies fast. View details instantly.</h2>
+            <p>Type a movie title and press Search. Results load from OMDb (replace the API key in script.js). Click a card to see more details.</p>
+        </div>
+    </section>
+
+    <main>
+        <div id="status" class="empty">Start by typing a movie title and press Search.</div>
+        <div id="results" class="results-grid" aria-live="polite"></div>
+    </main>
+
+    <footer>Built for a Course Project • Add your OMDb API key in script.js to enable live searches.</footer>
+
+    <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+        <div class="modal" id="modal">
+            <img id="modalPoster" class="poster" src="" alt="">
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:start">
+                    <div>
+                        <h3 id="modalTitle">Title</h3>
+                        <div id="modalYear" style="color:var(--muted);margin-bottom:8px"></div>
+                    </div>
+                    <button class="close" id="modalClose">✕</button>
+                </div>
+                <div id="modalMeta" style="color:var(--muted);font-size:13px;margin-bottom:12px"></div>
+                <p id="modalPlot" style="margin-top:6px;color:#dbeaf6"></p>
+                <div id="modalExtra" style="margin-top:10px;color:var(--muted;font-size:13px)"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/home.js"></script>
+</body>
+</html>
