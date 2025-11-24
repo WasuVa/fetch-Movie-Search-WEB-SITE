@@ -1,11 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FETCH MOVIES - POPULAR</title>
+    <title>FETCH MOVIES — Popular</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
     <link rel="stylesheet" href="css/main.css">
+
 </head>
+
 <body>
     <header class="navbar-header">
         <nav class="navbar">
@@ -15,10 +21,10 @@
                     <a href="index.html"><img class="logo-name" src="assets/namelogo.png" alt="name logo"></a>
                 </div>
             </div>
-            
+
             <ul class="nav-menu">
-                <li><a href="home.html" class="nav-link active">Home</a></li>
-                <li><a href="populer.html" class="nav-link">Popular</a></li>
+                <li><a href="home.html" class="nav-link">Home</a></li>
+                <li><a href="populer.html" class="nav-link active">Popular</a></li>
                 <li><a href="about.html" class="nav-link">About</a></li>
                 <li><a href="search.html" class="nav-link">Search</a></li>
             </ul>
@@ -30,7 +36,115 @@
             </div>
         </nav>
     </header>
-    
-    <script src="js/home.js"></script>
+
+    <section class="search-wrap">
+        <form id="searchForm" class="search" onsubmit="return false;">
+            <input id="query" type="search" placeholder="Search movies by title, e.g. Inception, The Matrix..."
+                aria-label="Search movies">
+            <button id="searchBtn" type="submit">Search</button>
+        </form>
+    </section>
+
+    <section class="hero" aria-hidden="false">
+        <img src="https://images.unsplash.com/photo-1517604931442-7d4a7f4a3d6b?q=80&w=800&auto=format&fit=crop&ixlib=rb-4.0.3&s=placeholder"
+            alt="Cinema">
+        <div class="txt">
+            <h2>Discover Popular Movies</h2>
+            <p>Explore the movies that are trending now. Click a card to see more details.</p>
+        </div>
+    </section>
+
+    <main>
+        <div id="popularStatus" class="empty">Loading popular movies...</div>
+        <div id="popularResults" class="results-grid" aria-live="polite"></div>
+    </main>
+
+    <div id="modalBackdrop" class="modal-backdrop" role="dialog" aria-modal="true">
+        <div class="modal" id="modal">
+            <img id="modalPoster" class="poster" src="" alt="">
+            <div>
+                <div style="display:flex;justify-content:space-between;align-items:start">
+                    <div>
+                        <h3 id="modalTitle">Title</h3>
+                        <div id="modalYear" style="color:var(--muted);margin-bottom:8px"></div>
+                    </div>
+                    <button class="close" id="modalClose">✕</button>
+                </div>
+                <div id="modalMeta" style="color:var(--muted);font-size:13px;margin-bottom:12px"></div>
+                <p id="modalPlot" style="margin-top:6px;color:#dbeaf6"></p>
+                <div id="modalExtra" style="margin-top:10px;color:var(--muted;font-size:13px)"></div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <div class="footer-brand">
+                    <img src="assets/Mainlogo.png" alt="Fetch Movies" class="footer-logo">
+                    <h3>FETCH MOVIES</h3>
+                </div>
+                <p class="footer-desc">Your gateway to discovering amazing movies. Search, explore, and enjoy cinema
+                    from around the world.</p>
+                <div class="social-links">
+                    <a href="#" aria-label="Facebook"><svg width="20" height="20" fill="currentColor"
+                            viewBox="0 0 24 24">
+                            <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z" />
+                        </svg></a>
+                    <a href="#" aria-label="Twitter"><svg width="20" height="20" fill="currentColor"
+                            viewBox="0 0 24 24">
+                            <path
+                                d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z" />
+                            </a>
+                    <a href="https://github.com/WasuVa" target="_blank" aria-label="GitHub"><svg width="20" height="20"
+                            fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.17 6.839 9.49.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.831.092-.646.35-1.086.636-1.336-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0112 6.836c.85.004 1.705.114 2.504.336 1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.167 22 16.418 22 12c0-5.523-4.477-10-10-10z" />
+                        </svg></a>
+                    <a href="https://www.linkedin.com/in/wasuda-sandaruvan-94b1bb370/" target="_blank"
+                        aria-label="LinkedIn"><svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z" />
+                        </svg></a>
+                </div>
+            </div>
+
+            <div class="footer-section">
+                <h4>Quick Links</h4>
+                <ul class="footer-links">
+                    <li><a href="home.html">Home</a></li>
+                    <li><a href="populer.html">Popular Movies</a></li>
+                    <li><a href="search.html">Advanced Search</a></li>
+                    <li><a href="about.html">About Us</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Categories</h4>
+                <ul class="footer-links">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Comedy</a></li>
+                    <li><a href="#">Drama</a></li>
+                    <li><a href="#">Sci-Fi</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-section">
+                <h4>Support</h4>
+                <ul class="footer-links">
+                    <li><a href="about.html#help-center">Help Center</a></li>
+                    <li><a href="about.html#contact-us">Contact Us</a></li>
+                    <li><a href="about.html#privacy-policy">Privacy Policy</a></li>
+                    <li><a href="about.html#terms-of-service">Terms of Service</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2024 Fetch Movies. All rights reserved. | WasuVa Creation</p>
+            <p class="api-credit">Powered by <a href="https://www.omdbapi.com/" target="_blank">OMDb API</a></p>
+        </div>
+    </footer>
 </body>
+
 </html>
