@@ -3,17 +3,24 @@ fetch("components/loader/loading.html").then(res=> res.text()).then(data=> {
 })
 
 function navigateToHome() {
-    window.location.href = 'components/home/home.html';
+    fetch("components/home/home.html").then(res=> res.text()).then(data=> {
+        document.getElementById("root").innerHTML = data;
+    })
 }
 function navigateToPopular() {
-    window.location.href = 'components/populer/populer.html';
+    fetch("components/populer/populer.html").then(res=> res.text()).then(data=> {
+        document.getElementById("root").innerHTML = data;
+    })
 }
 function navigateToSearch() {
-    window.location.href = 'components/search/search.html';
+    fetch("components/search/search.html").then(res=> res.text()).then(data=> {
+        document.getElementById("root").innerHTML = data;
+    })
 }
 function navigateToAbout() {
-    window.location.href = 'components/about/about.html';
+    fetch("components/about/about.html").then(res=> res.text()).then(data=> {
+        document.getElementById("root").innerHTML = data;
+    })
 }
-function navigateToContact() {
-    window.location.href = 'components/contact/contact.html';
-}
+
+

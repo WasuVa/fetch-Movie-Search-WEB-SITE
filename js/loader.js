@@ -115,6 +115,6 @@ if (loaderContainer) {
 setTimeout(() => {
     if (progress < 100) {
         console.warn('Loading timeout. Redirecting...');
-        window.location.href = 'components/home/home.html';
+        window.location.href =navigateToHome();
     }
 }, 15000);
