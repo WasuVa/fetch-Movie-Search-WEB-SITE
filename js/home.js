@@ -31,7 +31,6 @@ function getmovieData() {
         .then(data => {
             const moviesContainer = data[0];
             
-        
         })
 }
 
