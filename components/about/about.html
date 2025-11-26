@@ -1,17 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FETCH MOVIES — About</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    <link rel="stylesheet" href="css/main.css">
-</head>
-
-<body>
+<div>
     <header class="navbar-header">
         <nav class="navbar">
             <div class="brand">
@@ -22,10 +9,10 @@
             </div>
 
             <ul class="nav-menu">
-                <li><a href="home.html" class="nav-link">Home</a></li>
-                <li><a href="populer.html" class="nav-link">Popular</a></li>
-                <li><a href="about.html" class="nav-link active">About</a></li>
-                <li><a href="search.html" class="nav-link">Search</a></li>
+                <li><a href="components/home/home.html" class="nav-link">Home</a></li>
+                <li><a href="components/populer/populer.html" class="nav-link">Popular</a></li>
+                <li><a href="components/search/search.html" class="nav-link">Search</a></li>
+                <li><a href="components/about/about.html" class="nav-link active">About</a></li>
             </ul>
 
             <div class="hamburger">
@@ -61,13 +48,16 @@
             </section>
 
             <!-- Help Center Section -->
-            <section id="help-center" style="margin-bottom: 40px; padding: 30px; background: rgba(154, 205, 50, 0.05); border-radius: 12px; border-left: 4px solid #9acd32;">
+            <section id="help-center"
+                style="margin-bottom: 40px; padding: 30px; background: rgba(154, 205, 50, 0.05); border-radius: 12px; border-left: 4px solid #9acd32;">
                 <h2 style="font-size: 28px; color: #9acd32; margin-bottom: 20px;">📚 Help Center</h2>
-                
+
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">How to Search for Movies?</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        Simply type the movie title in the search bar on the home page and press Enter or click the Search button. 
+                        Simply type the movie title in the search bar on the home page and press Enter or click the
+                        Search
+                        button.
                         Results will appear instantly showing movie posters, titles, and release years.
                     </p>
                 </div>
@@ -75,7 +65,7 @@
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">How to View Movie Details?</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        Click on any movie card from the search results to open a detailed modal window. This will show 
+                        Click on any movie card from the search results to open a detailed modal window. This will show
                         comprehensive information including plot summary, cast, director, ratings, and runtime.
                     </p>
                 </div>
@@ -83,8 +73,9 @@
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">Setting Up API Key</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        To enable movie search functionality, you need an OMDb API key. Visit 
-                        <a href="https://www.omdbapi.com/apikey.aspx" target="_blank" style="color: #9acd32; text-decoration: none;">www.omdbapi.com/apikey.aspx</a>, 
+                        To enable movie search functionality, you need an OMDb API key. Visit
+                        <a href="https://www.omdbapi.com/apikey.aspx" target="_blank"
+                            style="color: #9acd32; text-decoration: none;">www.omdbapi.com/apikey.aspx</a>,
                         get your free API key, and add it to the JavaScript files.
                     </p>
                 </div>
@@ -92,22 +83,29 @@
                 <div>
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">Troubleshooting</h3>
                     <ul style="color: var(--muted); font-size: 15px; list-style: disc; padding-left: 20px;">
-                        <li style="margin-bottom: 8px;">No search results? Check your internet connection and API key configuration.</li>
-                        <li style="margin-bottom: 8px;">Images not loading? The movie might not have poster images available in the database.</li>
-                        <li style="margin-bottom: 8px;">Mobile menu not working? Ensure JavaScript is enabled in your browser.</li>
+                        <li style="margin-bottom: 8px;">No search results? Check your internet connection and API key
+                            configuration.</li>
+                        <li style="margin-bottom: 8px;">Images not loading? The movie might not have poster images
+                            available
+                            in the database.</li>
+                        <li style="margin-bottom: 8px;">Mobile menu not working? Ensure JavaScript is enabled in your
+                            browser.</li>
                     </ul>
                 </div>
             </section>
 
             <!-- Contact Us Section -->
-            <section id="contact-us" style="margin-bottom: 40px; padding: 30px; background: rgba(154, 205, 50, 0.05); border-radius: 12px; border-left: 4px solid #9acd32;">
+            <section id="contact-us"
+                style="margin-bottom: 40px; padding: 30px; background: rgba(154, 205, 50, 0.05); border-radius: 12px; border-left: 4px solid #9acd32;">
                 <h2 style="font-size: 28px; color: #9acd32; margin-bottom: 20px;">📧 Contact Us</h2>
-                
+
                 <p style="color: var(--muted); font-size: 16px; margin-bottom: 20px;">
-                    We'd love to hear from you! Whether you have questions, feedback, or suggestions, feel free to reach out.
+                    We'd love to hear from you! Whether you have questions, feedback, or suggestions, feel free to reach
+                    out.
                 </p>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 25px;">
+                <div
+                    style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 25px;">
                     <div style="padding: 20px; background: rgba(255,255,255,0.02); border-radius: 10px;">
                         <h4 style="color: #9acd32; margin-bottom: 10px;">📍 Developer</h4>
                         <p style="color: var(--muted); font-size: 14px; margin: 5px 0;">WasuVa Creation</p>
@@ -117,44 +115,53 @@
                     <div style="padding: 20px; background: rgba(255,255,255,0.02); border-radius: 10px;">
                         <h4 style="color: #9acd32; margin-bottom: 10px;">📧 Email</h4>
                         <p style="color: var(--muted); font-size: 14px; margin: 5px 0;">
-                            <a href="mailto:contact@fetchmovies.com" style="color: #9acd32; text-decoration: none;">contact@fetchmovies.com</a>
+                            <a href="mailto:contact@fetchmovies.com"
+                                style="color: #9acd32; text-decoration: none;">contact@fetchmovies.com</a>
                         </p>
                         <p style="color: var(--muted); font-size: 14px; margin: 5px 0;">
-                            <a href="mailto:support@fetchmovies.com" style="color: #9acd32; text-decoration: none;">support@fetchmovies.com</a>
+                            <a href="mailto:support@fetchmovies.com"
+                                style="color: #9acd32; text-decoration: none;">support@fetchmovies.com</a>
                         </p>
                     </div>
 
                     <div style="padding: 20px; background: rgba(255,255,255,0.02); border-radius: 10px;">
                         <h4 style="color: #9acd32; margin-bottom: 10px;">🌐 Social Media</h4>
                         <p style="color: var(--muted); font-size: 14px; margin: 5px 0;">
-                            <a href="https://github.com/WasuVa" target="_blank" style="color: #9acd32; text-decoration: none;">GitHub: @WasuVa</a>
+                            <a href="https://github.com/WasuVa" target="_blank"
+                                style="color: #9acd32; text-decoration: none;">GitHub: @WasuVa</a>
                         </p>
                         <p style="color: var(--muted); font-size: 14px; margin: 5px 0;">
-                            <a href="https://www.linkedin.com/in/wasuda-sandaruvan-94b1bb370/" target="_blank" style="color: #9acd32; text-decoration: none;">LinkedIn Profile</a>
+                            <a href="https://www.linkedin.com/in/wasuda-sandaruvan-94b1bb370/" target="_blank"
+                                style="color: #9acd32; text-decoration: none;">LinkedIn Profile</a>
                         </p>
                     </div>
                 </div>
             </section>
 
             <!-- Privacy Policy Section -->
-            <section id="privacy-policy" style="margin-bottom: 40px; padding: 30px; background: rgba(154, 205, 50, 0.05); border-radius: 12px; border-left: 4px solid #9acd32;">
+            <section id="privacy-policy"
+                style="margin-bottom: 40px; padding: 30px; background: rgba(154, 205, 50, 0.05); border-radius: 12px; border-left: 4px solid #9acd32;">
                 <h2 style="font-size: 28px; color: #9acd32; margin-bottom: 20px;">🔒 Privacy Policy</h2>
-                
-                <p style="color: var(--muted); font-size: 14px; margin-bottom: 15px;"><em>Last Updated: January 2025</em></p>
+
+                <p style="color: var(--muted); font-size: 14px; margin-bottom: 15px;"><em>Last Updated: January
+                        2025</em>
+                </p>
 
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">Information We Collect</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        Fetch Movies does not collect, store, or process any personal information from users. All movie 
-                        searches are performed directly through the OMDb API, and no search history is saved on our servers.
+                        Fetch Movies does not collect, store, or process any personal information from users. All movie
+                        searches are performed directly through the OMDb API, and no search history is saved on our
+                        servers.
                     </p>
                 </div>
 
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">Third-Party Services</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        This website uses the Open Movie Database (OMDb) API to fetch movie information. Please refer to 
-                        <a href="https://www.omdbapi.com/" target="_blank" style="color: #9acd32; text-decoration: none;">OMDb's privacy policy</a> 
+                        This website uses the Open Movie Database (OMDb) API to fetch movie information. Please refer to
+                        <a href="https://www.omdbapi.com/" target="_blank"
+                            style="color: #9acd32; text-decoration: none;">OMDb's privacy policy</a>
                         for information on how they handle data.
                     </p>
                 </div>
@@ -162,7 +169,7 @@
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">Cookies and Local Storage</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        We use browser local storage only to maintain your navigation preferences (active menu state). 
+                        We use browser local storage only to maintain your navigation preferences (active menu state).
                         No cookies are used for tracking or advertising purposes.
                     </p>
                 </div>
@@ -170,22 +177,26 @@
                 <div>
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">Data Security</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        Since we don't collect personal data, there is minimal risk to your privacy. All API calls are made 
+                        Since we don't collect personal data, there is minimal risk to your privacy. All API calls are
+                        made
                         over HTTPS to ensure secure communication.
                     </p>
                 </div>
             </section>
 
             <!-- Terms of Service Section -->
-            <section id="terms-of-service" style="margin-bottom: 40px; padding: 30px; background: rgba(154, 205, 50, 0.05); border-radius: 12px; border-left: 4px solid #9acd32;">
+            <section id="terms-of-service"
+                style="margin-bottom: 40px; padding: 30px; background: rgba(154, 205, 50, 0.05); border-radius: 12px; border-left: 4px solid #9acd32;">
                 <h2 style="font-size: 28px; color: #9acd32; margin-bottom: 20px;">📜 Terms of Service</h2>
-                
-                <p style="color: var(--muted); font-size: 14px; margin-bottom: 15px;"><em>Effective Date: January 2025</em></p>
+
+                <p style="color: var(--muted); font-size: 14px; margin-bottom: 15px;"><em>Effective Date: January
+                        2025</em>
+                </p>
 
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">1. Acceptance of Terms</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        By accessing and using Fetch Movies, you accept and agree to be bound by these Terms of Service. 
+                        By accessing and using Fetch Movies, you accept and agree to be bound by these Terms of Service.
                         This is a student project created for educational purposes at ICET-ICD.
                     </p>
                 </div>
@@ -193,7 +204,7 @@
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">2. Use of Service</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        Fetch Movies is provided free of charge for personal, non-commercial use. You agree to use the 
+                        Fetch Movies is provided free of charge for personal, non-commercial use. You agree to use the
                         service responsibly and not to abuse the API limits or attempt to disrupt the service.
                     </p>
                 </div>
@@ -201,7 +212,7 @@
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">3. Content and Copyright</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        All movie data, images, and information are sourced from the OMDb API. We do not claim ownership 
+                        All movie data, images, and information are sourced from the OMDb API. We do not claim ownership
                         of any movie content. All copyrights belong to their respective owners.
                     </p>
                 </div>
@@ -209,7 +220,7 @@
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">4. Limitation of Liability</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        Fetch Movies is provided "as is" without warranties of any kind. We are not responsible for the 
+                        Fetch Movies is provided "as is" without warranties of any kind. We are not responsible for the
                         accuracy of movie information or any issues arising from the use of this service.
                     </p>
                 </div>
@@ -217,7 +228,8 @@
                 <div style="margin-bottom: 20px;">
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">5. API Usage</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        Users must comply with OMDb API's terms of service. The free API tier has a limit of 1,000 requests 
+                        Users must comply with OMDb API's terms of service. The free API tier has a limit of 1,000
+                        requests
                         per day. Excessive use may result in temporary service interruption.
                     </p>
                 </div>
@@ -225,17 +237,20 @@
                 <div>
                     <h3 style="font-size: 20px; color: #e6eef6; margin-bottom: 10px;">6. Modifications</h3>
                     <p style="color: var(--muted); font-size: 15px;">
-                        We reserve the right to modify these terms at any time. Continued use of the service after changes 
+                        We reserve the right to modify these terms at any time. Continued use of the service after
+                        changes
                         constitutes acceptance of the new terms.
                     </p>
                 </div>
             </section>
 
-            <section style="margin-top: 50px; padding: 20px; background: rgba(154, 205, 50, 0.1); border-radius: 10px; text-align: center;">
+            <section
+                style="margin-top: 50px; padding: 20px; background: rgba(154, 205, 50, 0.1); border-radius: 10px; text-align: center;">
                 <h3 style="color: #9acd32; margin-bottom: 10px;">Have Questions?</h3>
                 <p style="color: var(--muted); font-size: 15px;">
-                    If you have any questions about our policies or services, please don't hesitate to 
-                    <a href="#contact-us" style="color: #9acd32; text-decoration: none; font-weight: 600;">contact us</a>.
+                    If you have any questions about our policies or services, please don't hesitate to
+                    <a href="#contact-us" style="color: #9acd32; text-decoration: none; font-weight: 600;">contact
+                        us</a>.
                 </p>
             </section>
         </div>
@@ -309,8 +324,4 @@
             <p class="api-credit">Powered by <a href="https://www.omdbapi.com/" target="_blank">OMDb API</a></p>
         </div>
     </footer>
-
-    <script src="js/home.js"></script>
-</body>
-
-</html>
+</div>

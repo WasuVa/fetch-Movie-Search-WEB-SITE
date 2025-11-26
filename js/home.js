@@ -1,9 +1,22 @@
 // ========== API CONFIGURATION ==========
-const API_KEY = ''; // <-- Add your OMDb API key here
-const API_BASE_URL = 'https://www.omdbapi.com/';
+function getmovieData() {
+    const movieName = document.getElementById('query').value;
 
-// ========== DOM ELEMENTS ==========
-// ...existing code...
+    if (!movieName.trim()) {
+        alert('Please enter a movie!');
+        return;
+    }
+    fetch(` http://www.omdbapi.com/?apikey=1c768e4f&s=${movieName}`)
+        .then(response => {
+        if (!response.ok) throw new Error('Network response was not ok');
+        return response.json();
+        })
+        .then(data => {
+            const moviesContainer = data[0];
+            
+        
+        })
+}
 
 // ========== NAVBAR FUNCTIONALITY ==========
 const hamburger = document.querySelector('.hamburger');
@@ -11,7 +24,7 @@ const navMenu = document.querySelector('.nav-menu');
 const navLinks = document.querySelectorAll('.nav-link');
 const body = document.body;
 
-// Toggle hamburger menu
+// ========== Toggle hamburger menu ========== 
 if (hamburger && navMenu) {
     hamburger.addEventListener('click', (e) => {
         e.preventDefault();
@@ -19,8 +32,7 @@ if (hamburger && navMenu) {
         
         hamburger.classList.toggle('active');
         navMenu.classList.toggle('active');
-        
-        // Prevent body scroll when menu is open
+
         if (navMenu.classList.contains('active')) {
             body.style.overflow = 'hidden';
         } else {
@@ -29,7 +41,6 @@ if (hamburger && navMenu) {
     });
 }
 
-// Handle nav link clicks
 navLinks.forEach(link => {
     link.addEventListener('click', () => {
         if (hamburger) {
@@ -111,6 +122,4 @@ window.addEventListener('scroll', () => {
     
     lastScroll = currentScroll;
 });
-
-// ...existing code...
 
