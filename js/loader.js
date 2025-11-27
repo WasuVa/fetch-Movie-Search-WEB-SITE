@@ -20,9 +20,10 @@ function updateProgress() {
         const increment = Math.floor(Math.random() * 6) + 2;
         progress = Math.min(progress + increment, 100);
         
-        // Update progress bar and percentage
+        // Update progress bar and percentage with force reflow
         if (loadingProgress) {
             loadingProgress.style.width = progress + '%';
+            loadingProgress.style.transition = 'width 0.3s ease';
         }
         if (loadingPercentage) {
             loadingPercentage.textContent = progress + '%';
@@ -115,6 +116,6 @@ if (loaderContainer) {
 setTimeout(() => {
     if (progress < 100) {
         console.warn('Loading timeout. Redirecting...');
-        window.location.href =navigateToHome();
+        window.location.href = 'components/home/home.html';
     }
 }, 15000);
