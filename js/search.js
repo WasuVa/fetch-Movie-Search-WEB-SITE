@@ -38,24 +38,9 @@ let currentFilters = {
     type: ''
 };
 
-// ========== DOM ELEMENTS =========
-const qInput = document.getElementById('query');
-const resultsEl = document.getElementById('results');
-const statusEl = document.getElementById('status');
-const searchForm = document.getElementById('searchForm');
-const genreFilter = document.getElementById('genreFilter');
-const yearFilter = document.getElementById('yearFilter');
-const ratingFilter = document.getElementById('ratingFilter');
-const typeFilter = document.getElementById('typeFilter');
-const applyFiltersBtn = document.getElementById('applyFilters');
-const resetFiltersBtn = document.getElementById('resetFilters');
-const filterStatus = document.getElementById('filterStatus');
-const toggleFiltersBtn = document.getElementById('toggleFilters');
-const filterContent = document.getElementById('filterContent');
-const sortBtns = document.querySelectorAll('.sort-btn');
-
 // ========== UTILITY FUNCTIONS =========
 function showStatus(text, isError = false) {
+    const statusEl = document.getElementById('status');
     if (statusEl) {
         statusEl.textContent = text;
         statusEl.style.color = isError ? '#ffb3b3' : 'var(--muted)';
@@ -64,12 +49,14 @@ function showStatus(text, isError = false) {
 }
 
 function hideStatus() {
+    const statusEl = document.getElementById('status');
     if (statusEl) {
         statusEl.style.display = 'none';
     }
 }
 
 function showFilterStatus(text, isError = false) {
+    const filterStatus = document.getElementById('filterStatus');
     if (filterStatus) {
         filterStatus.textContent = text;
         filterStatus.style.background = isError ? 'rgba(255, 59, 59, 0.2)' : 'rgba(154, 205, 50, 0.1)';
@@ -87,6 +74,7 @@ function escapeHtml(s) {
 
 // ========== LOAD RANDOM MOVIES =========
 function loadRandomMovies() {
+    const resultsEl = document.getElementById('results');
     if (!resultsEl) return;
 
     resultsEl.innerHTML = '';
@@ -169,6 +157,11 @@ function loadRandomMovies() {
 
 // ========== SEARCH MOVIES =========
 function searchMovies() {
+    const qInput = document.getElementById('query');
+    const resultsEl = document.getElementById('results');
+    
+    if (!qInput || !resultsEl) return;
+    
     const query = qInput.value.trim();
 
     if (!query) {
@@ -307,11 +300,31 @@ function sortMovies(movies, sortType) {
 
 // ========== DISPLAY MOVIES =========
 function displayMovies(movies) {
+    const resultsEl = document.getElementById('results');
+    if (!resultsEl) return;
+    
     resultsEl.innerHTML = '';
 
     movies.forEach(movie => {
         const card = document.createElement('button');
         card.className = 'card';
+        card.onclick = () => openModal(movie.imdbID);
+
+        const poster = movie.Poster !== 'N/A' ? movie.Poster : 'https://via.placeholder.com/300x450?text=No+Image';
+        const rating = movie.imdbRating !== 'N/A' ? movie.imdbRating : 'N/A';
+
+        card.innerHTML = `
+            <img src="${escapeHtml(poster)}" alt="${escapeHtml(movie.Title)}" loading="lazy">
+            <div class="card-content">
+                <h3 style="color: white;">${escapeHtml(movie.Title)}</h3>
+                <p style="color: white;">${escapeHtml(movie.Year)} • ${escapeHtml(movie.Type)}</p>
+                <div class="rating" style="color: white;">⭐ ${escapeHtml(rating)}</div>
+            </div>
+        `;
+        resultsEl.appendChild(card);
+    });
+}
+
 // ========== OPEN MODAL =========
 function openModal(imdbID) {
     const modalBackdrop = document.getElementById('modalBackdrop');
@@ -351,138 +364,138 @@ function openModal(imdbID) {
             }
         })
         .catch(error => console.error('Error:', error));
-}       if (data.Response === 'True') {
-            if (modalPoster) modalPoster.src = data.Poster !== 'N/A' ? data.Poster : 'https://via.placeholder.com/300x450?text=No+Image';
-            if (modalTitle) modalTitle.textContent = data.Title;
-            if (modalYear) modalYear.textContent = `${data.Year} • ${data.Runtime || 'N/A'}`;
-            if (modalPlot) modalPlot.textContent = data.Plot || 'No plot available.';
-            if (modalMeta) modalMeta.textContent = `${data.Genre || 'N/A'} • Director: ${data.Director || 'N/A'}`;
-            if (modalExtra) modalExtra.innerHTML = `
-                <div style="color:var(--muted);margin-top:8px">
-                    <strong>Actors:</strong> ${data.Actors || 'N/A'}<br>
-                    <strong>Rated:</strong> ${data.Rated || 'N/A'}<br>
-                    <strong>IMDb Rating:</strong> ⭐ ${data.imdbRating || 'N/A'}/10
-                </div>
-            `;
-        }
-    } catch (error) {
-        console.error('Error:', error);
-    }
-}
-
-// ========== EVENT LISTENERS =========
-if (searchForm) {
-    searchForm.addEventListener('submit', (e) => {
-        e.preventDefault();
-        searchMovies();
-    });
-}
-
-if (qInput) {
-    qInput.addEventListener('input', () => {
-        if (qInput.value.trim() === '') {
-            setTimeout(() => {
-                if (qInput.value.trim() === '') {
-                    loadRandomMovies();
-                }
-            }, 500);
-        }
-    });
-}
-
-if (applyFiltersBtn) {
-    applyFiltersBtn.addEventListener('click', () => {
-        currentFilters.genre = genreFilter.value;
-        currentFilters.year = yearFilter.value;
-        currentFilters.rating = parseFloat(ratingFilter.value) || 0;
-        currentFilters.type = typeFilter.value;
-        applyFiltersAndSort();
-    });
-}
-
-if (resetFiltersBtn) {
-    resetFiltersBtn.addEventListener('click', () => {
-        genreFilter.value = '';
-        yearFilter.value = '';
-        ratingFilter.value = '0';
-        typeFilter.value = '';
-        currentFilters = { genre: '', year: '', rating: 0, type: '' };
-        currentSort = 'rating-desc';
-        
-        sortBtns.forEach(btn => {
-            btn.style.background = 'rgba(154, 205, 50, 0.15)';
-            btn.style.borderColor = 'rgba(154, 205, 50, 0.3)';
-        });
-        
-        if (allMoviesCache.length > 0) {
-            applyFiltersAndSort();
-        }
-        showFilterStatus('✓ All filters reset');
-    });
-}
-
-sortBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        currentSort = btn.dataset.sort;
-
-        sortBtns.forEach(b => {
-            b.style.background = 'rgba(154, 205, 50, 0.15)';
-            b.style.borderColor = 'rgba(154, 205, 50, 0.3)';
-        });
-        btn.style.background = 'rgba(154, 205, 50, 0.3)';
-        btn.style.borderColor = '#9acd32';
-        
-        applyFiltersAndSort();
-    });
-});
-
-if (toggleFiltersBtn) {
-    toggleFiltersBtn.addEventListener('click', () => {
-        if (filterContent.style.display === 'none') {
-            filterContent.style.display = 'block';
-            toggleFiltersBtn.textContent = 'Hide Filters';
-        } else {
-            filterContent.style.display = 'none';
-            toggleFiltersBtn.textContent = 'Show Filters';
-        }
-    });
-}
-
-const modalClose = document.getElementById('modalClose');
-const modalBackdrop = document.getElementById('modalBackdrop');
-
-if (modalClose) {
-    modalClose.addEventListener('click', () => {
-        if (modalBackdrop) modalBackdrop.style.display = 'none';
-    });
-}
-
-if (modalBackdrop) {
-    modalBackdrop.addEventListener('click', (e) => {
-        if (e.target === modalBackdrop) {
-            modalBackdrop.style.display = 'none';
-        }
-    });
-}
-
-// ========== NAVBAR =========
-const hamburger = document.querySelector('.hamburger');
-const navMenu = document.querySelector('.nav-menu');
-const body = document.body;
-
-if (hamburger && navMenu) {
-    hamburger.addEventListener('click', (e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        hamburger.classList.toggle('active');
-        navMenu.classList.toggle('active');
-        body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
-    });
 }
 
 // ========== INITIALIZE =========
-window.addEventListener('DOMContentLoaded', () => {
-    loadRandomMovies();
-});
+function initializeSearchPage() {
+    const qInput = document.getElementById('query');
+    const searchForm = document.getElementById('searchForm');
+    const applyFiltersBtn = document.getElementById('applyFilters');
+    const resetFiltersBtn = document.getElementById('resetFilters');
+    const toggleFiltersBtn = document.getElementById('toggleFilters');
+    const filterContent = document.getElementById('filterContent');
+    const sortBtns = document.querySelectorAll('.sort-btn');
+    const genreFilter = document.getElementById('genreFilter');
+    const yearFilter = document.getElementById('yearFilter');
+    const ratingFilter = document.getElementById('ratingFilter');
+    const typeFilter = document.getElementById('typeFilter');
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
+    const body = document.body;
 
-console.log('🔍 Advanced Search page initialized');
+    if (searchForm) {
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            searchMovies();
+        });
+    }
+
+    if (qInput) {
+        qInput.addEventListener('input', () => {
+            if (qInput.value.trim() === '') {
+                setTimeout(() => {
+                    if (qInput.value.trim() === '') {
+                        loadRandomMovies();
+                    }
+                }, 500);
+            }
+        });
+    }
+
+    if (applyFiltersBtn) {
+        applyFiltersBtn.addEventListener('click', () => {
+            currentFilters.genre = genreFilter.value;
+            currentFilters.year = yearFilter.value;
+            currentFilters.rating = parseFloat(ratingFilter.value) || 0;
+            currentFilters.type = typeFilter.value;
+            applyFiltersAndSort();
+        });
+    }
+
+    if (resetFiltersBtn) {
+        resetFiltersBtn.addEventListener('click', () => {
+            genreFilter.value = '';
+            yearFilter.value = '';
+            ratingFilter.value = '0';
+            typeFilter.value = '';
+            currentFilters = { genre: '', year: '', rating: 0, type: '' };
+            currentSort = 'rating-desc';
+            
+            sortBtns.forEach(btn => {
+                btn.style.background = 'rgba(154, 205, 50, 0.15)';
+                btn.style.borderColor = 'rgba(154, 205, 50, 0.3)';
+            });
+            
+            if (allMoviesCache.length > 0) {
+                applyFiltersAndSort();
+            }
+            showFilterStatus('✓ All filters reset');
+        });
+    }
+
+    sortBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentSort = btn.dataset.sort;
+
+            sortBtns.forEach(b => {
+                b.style.background = 'rgba(154, 205, 50, 0.15)';
+                b.style.borderColor = 'rgba(154, 205, 50, 0.3)';
+            });
+            btn.style.background = 'rgba(154, 205, 50, 0.3)';
+            btn.style.borderColor = '#9acd32';
+            
+            applyFiltersAndSort();
+        });
+    });
+
+    if (toggleFiltersBtn) {
+        toggleFiltersBtn.addEventListener('click', () => {
+            if (filterContent.style.display === 'none') {
+                filterContent.style.display = 'block';
+                toggleFiltersBtn.textContent = 'Hide Filters';
+            } else {
+                filterContent.style.display = 'none';
+                toggleFiltersBtn.textContent = 'Show Filters';
+            }
+        });
+    }
+
+    const modalClose = document.getElementById('modalClose');
+    const modalBackdrop = document.getElementById('modalBackdrop');
+
+    if (modalClose) {
+        modalClose.addEventListener('click', () => {
+            if (modalBackdrop) modalBackdrop.style.display = 'none';
+        });
+    }
+
+    if (modalBackdrop) {
+        modalBackdrop.addEventListener('click', (e) => {
+            if (e.target === modalBackdrop) {
+                modalBackdrop.style.display = 'none';
+            }
+        });
+    }
+
+    if (hamburger && navMenu) {
+        hamburger.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            hamburger.classList.toggle('active');
+            navMenu.classList.toggle('active');
+            body.style.overflow = navMenu.classList.contains('active') ? 'hidden' : '';
+        });
+    }
+
+    loadRandomMovies();
+    console.log('🔍 Advanced Search page initialized');
+}
+
+
+if (document.readyState === 'loading') {
+    window.addEventListener('DOMContentLoaded', initializeSearchPage);
+} else {
+    initializeSearchPage();
+}
+
+window.initializeSearchPage = initializeSearchPage;

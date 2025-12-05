@@ -15,6 +15,10 @@ function navigateToPopular() {
 function navigateToSearch() {
     fetch("components/search/search.html").then(res=> res.text()).then(data=> {
         document.getElementById("root").innerHTML = data;
+        // Initialize search page after content is loaded
+        if (typeof window.initializeSearchPage === 'function') {
+            window.initializeSearchPage();
+        }
     })
 }
 function navigateToAbout() {
