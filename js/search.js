@@ -86,64 +86,89 @@ function escapeHtml(s) {
 }
 
 // ========== LOAD RANDOM MOVIES =========
-async function loadRandomMovies() {
+function loadRandomMovies() {
     if (!resultsEl) return;
 
     resultsEl.innerHTML = '';
     showStatus('Loading popular movies...(It will take some time.)');
     allMoviesCache = [];
 
-    try {
-        const allMovies = [];
-        const numberOfKeywords = 3;
+    const allMovies = [];
+    const numberOfKeywords = 3;
 
-        const shuffledKeywords = randomMovieKeywords.sort(() => 0.5 - Math.random());
-        const selectedKeywords = shuffledKeywords.slice(0, numberOfKeywords);
+    const shuffledKeywords = randomMovieKeywords.sort(() => 0.5 - Math.random());
+    const selectedKeywords = shuffledKeywords.slice(0, numberOfKeywords);
 
-        for (const keyword of selectedKeywords) {
-            const url = `${API_BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(keyword)}`;
-            const response = await fetch(url);
-
-            if (!response.ok) continue;
-
-            const data = await response.json();
-
-            if (data.Response === "True" && data.Search) {
-                // Fetch full details for each movie
-                for (const movie of data.Search) {
-                    try {
-                        const detailUrl = `${API_BASE_URL}?apikey=${API_KEY}&i=${movie.imdbID}&plot=short`;
-                        const detailRes = await fetch(detailUrl);
-                        const detailData = await detailRes.json();
-
-                        if (detailData.Response === 'True') {
-                            allMovies.push(detailData);
-                        }
-                    } catch (err) {
-                        console.error('Error fetching movie details:', err);
-                    }
+    const fetchPromises = selectedKeywords.map(keyword => {
+        const url = `${API_BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(keyword)}`;
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                return response.json();
+            })
+            .then(data => {
+                if (data.Response === "True" && data.Search) {
+                    const detailPromises = data.Search.map(movie => {
+                        const detailUrl = `${API_BASE_URL}?apikey=${API_KEY}&i=${movie.imdbID}&plot=short`;
+                        return fetch(detailUrl)
+                            .then(response => {
+                                if (!response.ok) {
+                                    throw new Error(`HTTP error! status: ${response.status}`);
+                                }
+                                return response.json();
+                            })
+                            .then(detailData => {
+                                if (detailData.Response === 'True') {
+                                    return detailData;
+                                }
+                                return null;
+                            })
+                            .catch(error => {
+                                console.error('Error:', error);
+                                return null;
+                            });
+                    });
+                    return Promise.all(detailPromises);
+                }
+                return [];
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                return [];
+            });
+    });
+
+    Promise.all(fetchPromises)
+        .then(results => {
+            results.forEach(movieList => {
+                if (movieList && Array.isArray(movieList)) {
+                    movieList.forEach(movie => {
+                        if (movie) allMovies.push(movie);
+                    });
+                }
+            });
+
+            if (allMovies.length > 0) {
+                const uniqueMovies = Array.from(new Map(allMovies.map(movie => [movie.imdbID, movie])).values());
+                const shuffled = uniqueMovies.sort(() => 0.5 - Math.random());
+                allMoviesCache = shuffled.slice(0, 30);
+
+                displayMovies(allMoviesCache);
+                showStatus(`Showing ${allMoviesCache.length} popular movies. Search or use filters to find more!`);
+            } else {
+                showStatus('No movies loaded. Try searching for something!', true);
             }
-        }
-
-        if (allMovies.length > 0) {
-            const uniqueMovies = Array.from(new Map(allMovies.map(movie => [movie.imdbID, movie])).values());
-            const shuffled = uniqueMovies.sort(() => 0.5 - Math.random());
-            allMoviesCache = shuffled.slice(0, 30);
-
-            displayMovies(allMoviesCache);
-            showStatus(`Showing ${allMoviesCache.length} popular movies. Search or use filters to find more!`);
-        } else {
-            showStatus('No movies loaded. Try searching for something!', true);
-        }
-    } catch (error) {
-        console.error('Error loading movies:', error);
-        showStatus('Error loading movies. Please try searching.', true);
-    }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showStatus('Error loading movies. Please try searching.', true);
+        });
 }
 
 // ========== SEARCH MOVIES =========
-async function searchMovies() {
+function searchMovies() {
     const query = qInput.value.trim();
 
     if (!query) {
@@ -155,46 +180,63 @@ async function searchMovies() {
     showStatus('Searching...');
     allMoviesCache = [];
 
-    try {
-        let url = `${API_BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(query)}`;
+    let url = `${API_BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(query)}`;
 
-        if (currentFilters.type) {
-            url += `&type=${currentFilters.type}`;
-        }
-
-        if (currentFilters.year && !currentFilters.year.includes('-')) {
-            url += `&y=${currentFilters.year}`;
-        }
-
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.Response === "True" && data.Search) {
-            const detailedMovies = [];
-
-            for (const movie of data.Search) {
-                try {
-                    const detailUrl = `${API_BASE_URL}?apikey=${API_KEY}&i=${movie.imdbID}`;
-                    const detailRes = await fetch(detailUrl);
-                    const detailData = await detailRes.json();
-
-                    if (detailData.Response === 'True') {
-                        detailedMovies.push(detailData);
-                    }
-                } catch (err) {
-                    console.error('Error fetching details:', err);
-                }
-            }
-
-            allMoviesCache = detailedMovies;
-            applyFiltersAndSort();
-        } else {
-            showStatus(data.Error || 'No movies found. Try a different search!', true);
-        }
-    } catch (error) {
-        console.error('Search error:', error);
-        showStatus('Error searching. Please try again.', true);
+    if (currentFilters.type) {
+        url += `&type=${currentFilters.type}`;
     }
+
+    if (currentFilters.year && !currentFilters.year.includes('-')) {
+        url += `&y=${currentFilters.year}`;
+    }
+
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.Response === "True" && data.Search) {
+                const detailPromises = data.Search.map(movie => {
+                    const detailUrl = `${API_BASE_URL}?apikey=${API_KEY}&i=${movie.imdbID}`;
+                    return fetch(detailUrl)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`HTTP error! status: ${response.status}`);
+                            }
+                            return response.json();
+                        })
+                        .then(detailData => {
+                            if (detailData.Response === 'True') {
+                                return detailData;
+                            }
+                            return null;
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            return null;
+                        });
+                });
+
+                return Promise.all(detailPromises);
+            } else {
+                showStatus(data.Error || 'No movies found. Try a different search!', true);
+                return [];
+            }
+        })
+        .then(detailedMovies => {
+            const validMovies = detailedMovies.filter(movie => movie !== null);
+            allMoviesCache = validMovies;
+            if (validMovies.length > 0) {
+                applyFiltersAndSort();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showStatus('Error searching. Please try again.', true);
+        });
 }
 
 // ========== APPLY FILTERS AND SORT =========
@@ -270,25 +312,8 @@ function displayMovies(movies) {
     movies.forEach(movie => {
         const card = document.createElement('button');
         card.className = 'card';
-        card.type = 'button';
-        card.innerHTML = `
-            <img class="poster" 
-                 src="${movie.Poster !== 'N/A' ? movie.Poster : 'https://via.placeholder.com/300x450?text=No+Image'}" 
-                 alt="${escapeHtml(movie.Title)} poster"
-                 loading="lazy">
-            <div class="title" style="color:white">${escapeHtml(movie.Title)}</div>
-            <div class="meta">
-                <span style="color:white">${movie.Year}</span>
-                <span style="color:#9acd32; font-weight: 600;">⭐ ${movie.imdbRating || 'N/A'}</span>
-            </div>
-        `;
-        card.addEventListener('click', () => openModal(movie.imdbID));
-        resultsEl.appendChild(card);
-    });
-}
-
 // ========== OPEN MODAL =========
-async function openModal(imdbID) {
+function openModal(imdbID) {
     const modalBackdrop = document.getElementById('modalBackdrop');
     const modalPoster = document.getElementById('modalPoster');
     const modalTitle = document.getElementById('modalTitle');
@@ -301,12 +326,32 @@ async function openModal(imdbID) {
 
     modalBackdrop.style.display = 'flex';
 
-    try {
-        const url = `${API_BASE_URL}?apikey=${API_KEY}&i=${imdbID}&plot=full`;
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.Response === 'True') {
+    const url = `${API_BASE_URL}?apikey=${API_KEY}&i=${imdbID}&plot=full`;
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.Response === 'True') {
+                if (modalPoster) modalPoster.src = data.Poster !== 'N/A' ? data.Poster : 'https://via.placeholder.com/300x450?text=No+Image';
+                if (modalTitle) modalTitle.textContent = data.Title;
+                if (modalYear) modalYear.textContent = `${data.Year} • ${data.Runtime || 'N/A'}`;
+                if (modalPlot) modalPlot.textContent = data.Plot || 'No plot available.';
+                if (modalMeta) modalMeta.textContent = `${data.Genre || 'N/A'} • Director: ${data.Director || 'N/A'}`;
+                if (modalExtra) modalExtra.innerHTML = `
+                <div style="color:var(--muted);margin-top:8px">
+                    <strong>Actors:</strong> ${data.Actors || 'N/A'}<br>
+                    <strong>Rated:</strong> ${data.Rated || 'N/A'}<br>
+                    <strong>IMDb Rating:</strong> ⭐ ${data.imdbRating || 'N/A'}/10
+                </div>
+            `;
+            }
+        })
+        .catch(error => console.error('Error:', error));
+}       if (data.Response === 'True') {
             if (modalPoster) modalPoster.src = data.Poster !== 'N/A' ? data.Poster : 'https://via.placeholder.com/300x450?text=No+Image';
             if (modalTitle) modalTitle.textContent = data.Title;
             if (modalYear) modalYear.textContent = `${data.Year} • ${data.Runtime || 'N/A'}`;

@@ -78,7 +78,7 @@ function escapeHtml(s) {
 }
 
 // ========== LOAD RANDOM MOVIES ON PAGE LOAD ==========
-async function loadRandomMovies() {
+function loadRandomMovies() {
     if (!resultsEl) return;
 
     resultsEl.innerHTML = '';
@@ -87,42 +87,57 @@ async function loadRandomMovies() {
     const allMovies = [];
     const numberOfKeywords = 3;
 
-    try {
-        const shuffledKeywords = randomMovieKeywords.sort(() => 0.5 - Math.random());
-        const selectedKeywords = shuffledKeywords.slice(0, numberOfKeywords);
-        for (const keyword of selectedKeywords) {
-            const url = `${API_BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(keyword)}`;
-            const response = await fetch(url);
+    const shuffledKeywords = randomMovieKeywords.sort(() => 0.5 - Math.random());
+    const selectedKeywords = shuffledKeywords.slice(0, numberOfKeywords);
 
-            if (!response.ok) {
-                continue;
-            }
+    const fetchPromises = selectedKeywords.map(keyword => {
+        const url = `${API_BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(keyword)}`;
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.Response === "True" && data.Search) {
+                    return data.Search;
+                }
+                return [];
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                return [];
+            });
+    });
 
-            const data = await response.json();
-
-            if (data.Response === "True" && data.Search) {
-                allMovies.push(...data.Search);
-            }
-        }
-
-        if (allMovies.length > 0) {
-            const uniqueMovies = Array.from(new Map(allMovies.map(movie => [movie.imdbID, movie])).values());
-
-            const shuffled = allMovies.sort(() => 0.5 - Math.random());
-            const selectedMovies = shuffled.slice(0, 30);
-
-            selectedMovies.forEach(movie => {
-                renderMovieCard(movie);
+    Promise.all(fetchPromises)
+        .then(results => {
+            results.forEach(movies => {
+                if (movies && Array.isArray(movies)) {
+                    allMovies.push(...movies);
+                }
             });
 
-            showStatus(`Showing ${selectedMovies.length} popular movies. Search to find more!`);
-        } else {
-            showStatus('No movies found. Try searching for something!', true);
-        }
-    } catch (error) {
-        console.error('Error loading movies:', error);
-        showStatus('Error loading movies. Please try again later.', true);
-    }
+            if (allMovies.length > 0) {
+                const uniqueMovies = Array.from(new Map(allMovies.map(movie => [movie.imdbID, movie])).values());
+
+                const shuffled = allMovies.sort(() => 0.5 - Math.random());
+                const selectedMovies = shuffled.slice(0, 30);
+
+                selectedMovies.forEach(movie => {
+                    renderMovieCard(movie);
+                });
+
+                showStatus(`Showing ${selectedMovies.length} popular movies. Search to find more!`);
+            } else {
+                showStatus('No movies found. Try searching for something!', true);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showStatus('Error loading movies. Please try again later.', true);
+        });
 }
 
 // ========== RENDER MOVIE CARD =========
@@ -148,7 +163,7 @@ function renderMovieCard(movie) {
 }
 
 // ========== SEARCH MOVIES =========
-async function getmovieData() {
+function getmovieData() {
     const movieName = qInput.value.trim();
 
     if (!movieName) {
@@ -159,32 +174,32 @@ async function getmovieData() {
     resultsEl.innerHTML = '';
     showStatus('Searching...');
 
-    try {
-        const url = `${API_BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(movieName)}`;
-        const response = await fetch(url);
-
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-
-        const data = await response.json();
-
-        if (data.Response === "True" && data.Search) {
-            data.Search.forEach(movie => {
-                renderMovieCard(movie);
-            });
-            showStatus(`✓ Found ${data.Search.length} results for "${movieName}"`);
-        } else {
-            showStatus(data.Error || 'No movies found. Try a different search!', true);
-        }
-    } catch (error) {
-        console.error('Error searching movies:', error);
-        showStatus('❌ Error searching. Please try again.', true);
-    }
+    const url = `${API_BASE_URL}?apikey=${API_KEY}&s=${encodeURIComponent(movieName)}`;
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.Response === "True" && data.Search) {
+                data.Search.forEach(movie => {
+                    renderMovieCard(movie);
+                });
+                showStatus(`✓ Found ${data.Search.length} results for "${movieName}"`);
+            } else {
+                showStatus(data.Error || 'No movies found. Try a different search!', true);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showStatus('❌ Error searching. Please try again.', true);
+        });
 }
 
 // ========== OPEN MOVIE DETAILS MODAL =========
-async function openModal(imdbID) {
+function openModal(imdbID) {
     const modalBackdrop = document.getElementById('modalBackdrop');
     const modalPoster = document.getElementById('modalPoster');
     const modalTitle = document.getElementById('modalTitle');
@@ -200,33 +215,38 @@ async function openModal(imdbID) {
     if (modalTitle) modalTitle.textContent = 'Loading...';
     if (modalPoster) modalPoster.src = '';
 
-    try {
-        const url = `${API_BASE_URL}?apikey=${API_KEY}&i=${imdbID}&plot=full`;
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.Response === 'True') {
-            if (modalPoster) modalPoster.src = data.Poster !== 'N/A' ? data.Poster : 'https://via.placeholder.com/300x450?text=No+Image';
-            if (modalTitle) modalTitle.textContent = data.Title;
-            if (modalYear) modalYear.textContent = `${data.Year} • ${data.Runtime || 'N/A'}`;
-            if (modalPlot) modalPlot.textContent = data.Plot || 'No plot available.';
-            if (modalMeta) modalMeta.textContent = `${data.Genre || 'N/A'} • Director: ${data.Director || 'N/A'}`;
-            if (modalExtra) modalExtra.innerHTML = `
+    const url = `${API_BASE_URL}?apikey=${API_KEY}&i=${imdbID}&plot=full`;
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.Response === 'True') {
+                if (modalPoster) modalPoster.src = data.Poster !== 'N/A' ? data.Poster : 'https://via.placeholder.com/300x450?text=No+Image';
+                if (modalTitle) modalTitle.textContent = data.Title;
+                if (modalYear) modalYear.textContent = `${data.Year} • ${data.Runtime || 'N/A'}`;
+                if (modalPlot) modalPlot.textContent = data.Plot || 'No plot available.';
+                if (modalMeta) modalMeta.textContent = `${data.Genre || 'N/A'} • Director: ${data.Director || 'N/A'}`;
+                if (modalExtra) modalExtra.innerHTML = `
                 <div style="color:var(--muted);margin-top:8px">
                     <strong>Actors:</strong> ${data.Actors || 'N/A'}<br>
                     <strong>Rated:</strong> ${data.Rated || 'N/A'}<br>
                     <strong>IMDb Rating:</strong> ${data.imdbRating || 'N/A'}/10
                 </div>
             `;
-        } else {
-            if (modalTitle) modalTitle.textContent = 'Not found';
-            if (modalPlot) modalPlot.textContent = 'Movie details not available.';
-        }
-    } catch (error) {
-        console.error('Error loading movie details:', error);
-        if (modalTitle) modalTitle.textContent = 'Error';
-        if (modalPlot) modalPlot.textContent = 'Could not load movie details.';
-    }
+            } else {
+                if (modalTitle) modalTitle.textContent = 'Not found';
+                if (modalPlot) modalPlot.textContent = 'Movie details not available.';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (modalTitle) modalTitle.textContent = 'Error';
+            if (modalPlot) modalPlot.textContent = 'Could not load movie details.';
+        });
 }
 
 // ========== EVENT LISTENERS ==========
@@ -237,7 +257,6 @@ if (searchForm) {
     });
 }
 
-// Search input - debounced search
 let searchTimeout;
 if (qInput) {
     qInput.addEventListener('input', () => {

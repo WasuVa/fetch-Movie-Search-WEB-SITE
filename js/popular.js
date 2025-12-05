@@ -72,7 +72,7 @@ function updateMovieCount() {
 }
 
 // ========== FETCH ALL POPULAR MOVIES ==========
-async function loadPopularMovies() {
+function loadPopularMovies() {
     if (!resultsEl) return;
 
     resultsEl.innerHTML = '';
@@ -81,34 +81,47 @@ async function loadPopularMovies() {
 
     let loadedCount = 0;
 
-    for (const title of popularMovieTitles) {
-        try {
-            const url = `${API_BASE_URL}?apikey=${API_KEY}&t=${encodeURIComponent(title)}`;
-            const response = await fetch(url);
-            const data = await response.json();
-
-            if (data.Response === 'True' && data.imdbRating && data.imdbRating !== 'N/A') {
-                allMovies.push({
-                    ...data,
-                    rating: parseFloat(data.imdbRating)
-                });
-                loadedCount++;
-
-                if (loadedCount % 5 === 0) {
-                    showStatus(`Loaded ${loadedCount} of ${popularMovieTitles.length} movies...`);
+    const fetchPromises = popularMovieTitles.map(title => {
+        const url = `${API_BASE_URL}?apikey=${API_KEY}&t=${encodeURIComponent(title)}`;
+        return fetch(url)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
-            }
-        } catch (error) {
-            console.error(`Error loading ${title}:`, error);
-        }
-    }
+                return response.json();
+            })
+            .then(data => {
+                if (data.Response === 'True' && data.imdbRating && data.imdbRating !== 'N/A') {
+                    loadedCount++;
 
-    allMovies.sort((a, b) => b.rating - a.rating);
+                    if (loadedCount % 5 === 0) {
+                        showStatus(`Loaded ${loadedCount} of ${popularMovieTitles.length} movies...`);
+                    }
 
-    filteredMovies = [...allMovies];
-    renderMovies();
-    hideStatus();
-    updateMovieCount();
+                    return {
+                        ...data,
+                        rating: parseFloat(data.imdbRating)
+                    };
+                }
+                return null;
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                return null;
+            });
+    });
+
+    Promise.all(fetchPromises)
+        .then(results => {
+            allMovies = results.filter(movie => movie !== null);
+            allMovies.sort((a, b) => b.rating - a.rating);
+
+            filteredMovies = [...allMovies];
+            renderMovies();
+            hideStatus();
+            updateMovieCount();
+        })
+        .catch(error => console.error('Error:', error));
 }
 
 // ========== RENDER MOVIES ==========
@@ -144,7 +157,7 @@ function renderMovieCard(movie) {
         <div class="title" style="color:white">${escapeHtml(movie.Title)}</div>
         <div class="meta">
             <span style="color:white">${movie.Year}</span>
-            <span style="color:#9acd32; font-weight: 600;">⭐ ${movie.imdbRating}</span>
+            <span style="color:#9acd32; font-weight: 600;">⭐${movie.imdbRating}</span>
         </div>
     `;
     card.addEventListener('click', () => openModal(movie.imdbID));
@@ -168,7 +181,7 @@ function filterByRating(minRating) {
 }
 
 // ========== OPEN MOVIE DETAILS MODAL ==========
-async function openModal(imdbID) {
+function openModal(imdbID) {
     const modalBackdrop = document.getElementById('modalBackdrop');
     const modalPoster = document.getElementById('modalPoster');
     const modalTitle = document.getElementById('modalTitle');
@@ -184,33 +197,38 @@ async function openModal(imdbID) {
     if (modalTitle) modalTitle.textContent = 'Loading...';
     if (modalPoster) modalPoster.src = '';
 
-    try {
-        const url = `${API_BASE_URL}?apikey=${API_KEY}&i=${imdbID}&plot=full`;
-        const response = await fetch(url);
-        const data = await response.json();
-
-        if (data.Response === 'True') {
-            if (modalPoster) modalPoster.src = data.Poster !== 'N/A' ? data.Poster : 'https://via.placeholder.com/300x450?text=No+Image';
-            if (modalTitle) modalTitle.textContent = data.Title;
-            if (modalYear) modalYear.textContent = `${data.Year} • ${data.Runtime || 'N/A'}`;
-            if (modalPlot) modalPlot.textContent = data.Plot || 'No plot available.';
-            if (modalMeta) modalMeta.textContent = `${data.Genre || 'N/A'} • Director: ${data.Director || 'N/A'}`;
-            if (modalExtra) modalExtra.innerHTML = `
+    const url = `${API_BASE_URL}?apikey=${API_KEY}&i=${imdbID}&plot=full`;
+    fetch(url)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            if (data.Response === 'True') {
+                if (modalPoster) modalPoster.src = data.Poster !== 'N/A' ? data.Poster : 'https://via.placeholder.com/300x450?text=No+Image';
+                if (modalTitle) modalTitle.textContent = data.Title;
+                if (modalYear) modalYear.textContent = `${data.Year} • ${data.Runtime || 'N/A'}`;
+                if (modalPlot) modalPlot.textContent = data.Plot || 'No plot available.';
+                if (modalMeta) modalMeta.textContent = `${data.Genre || 'N/A'} • Director: ${data.Director || 'N/A'}`;
+                if (modalExtra) modalExtra.innerHTML = `
                 <div style="color:var(--muted);margin-top:8px">
                     <strong>Actors:</strong> ${data.Actors || 'N/A'}<br>
                     <strong>Rated:</strong> ${data.Rated || 'N/A'}<br>
                     <strong>IMDb Rating:</strong> ⭐ ${data.imdbRating || 'N/A'}/10
                 </div>
             `;
-        } else {
-            if (modalTitle) modalTitle.textContent = 'Not found';
-            if (modalPlot) modalPlot.textContent = 'Movie details not available.';
-        }
-    } catch (error) {
-        console.error('Error loading movie details:', error);
-        if (modalTitle) modalTitle.textContent = 'Error';
-        if (modalPlot) modalPlot.textContent = 'Could not load movie details.';
-    }
+            } else {
+                if (modalTitle) modalTitle.textContent = 'Not found';
+                if (modalPlot) modalPlot.textContent = 'Movie details not available.';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            if (modalTitle) modalTitle.textContent = 'Error';
+            if (modalPlot) modalPlot.textContent = 'Could not load movie details.';
+        });
 }
 
 // ========== EVENT LISTENERS ==========
